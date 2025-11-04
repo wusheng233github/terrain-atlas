@@ -147,12 +147,8 @@ document.getElementById('generateAtlas').addEventListener('click', function () {
 
                 Promise.all(drawPromises).then(function () {
                     const preview = document.getElementById('atlasPreview');
-                    preview.innerHTML = '';
 
-                    const previewImg = document.createElement('img');
-                    previewImg.src = canvas.toDataURL('image/png');
-                    previewImg.style.maxWidth = '100%';
-                    preview.appendChild(previewImg);
+                    preview.src = canvas.toDataURL('image/png');
 
                     // 生成PNG下载
                     canvas.toBlob(function (blob) {
