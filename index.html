@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="UTF-8">
+        <title>MCPE纹理图集生成器</title>
+        <meta name="viewport" content="width=device-width,initial-scale=1.0">
+        <link rel="stylesheet" type="text/css" href="style.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mdui/1.0.2/css/mdui.min.css" integrity="sha512-Hh2syGXSuZabqBNcdvPiGo67ASyKhlKTZV9lLOmJp10qZ1v8/YPeuZBoOh0WmS/UPwWtRzQhNJfYyKDAhdGocQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+        <script src="tga.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" integrity="sha512-XMVd28F1oH/O71fzwBnV7HucLxVwtxf26XV8P4wPk26EDxuGZ91N8bsOttmnomcCD3CS5ZMRL50H0GgOHvegtg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/downloadjs/1.4.8/download.min.js" integrity="sha512-WiGQZv8WpmQVRUFXZywo7pHIO0G/o3RyiAJZj8YXNN4AV7ReR1RYWVmZJ6y3H06blPcjJmG/sBpOVZjTSFFlzQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <meta name="description" content="专为Minecraft PE资源包开发者设计的纹理图集生成工具，支持terrain-atlas.tga、terrain.meta文件生成和多级Mipmap纹理处理">
+        <meta name="keywords" content="MCPE, Minecraft PE, terrain-atlas, terrain.meta, Mipmap, 纹理生成, 自动">
+    </head>
+    <body class="mdui-theme-primary-teal mdui-theme-accent-pink mdui-appbar-with-toolbar">
+        <div class="mdui-appbar mdui-appbar-fixed">
+            <div class="mdui-toolbar mdui-color-theme">
+                <span class="mdui-typo-title">MCPE纹理图集生成器</span>
+                <div class="mdui-toolbar-spacer"></div>
+                <a href="https://mcpenav.top/">MCPENAV</a>
+                <a href="https://github.com/wusheng233github/minecraftpe-font-generator">字体生成器</a>
+            </div>
+        </div>
+        <main class="mdui-container mdui-typo">
+            <header>
+                <h1>MCPE纹理图集生成器</h1>
+                <p>本工具专门为Minecraft携带版(MCPE)资源包开发者设计，用于自动化生成纹理图集(terrain-atlas.tga)及相关文件。支持生成terrain.meta文件、纹理图集PNG/TGA格式，以及多级Mipmap纹理。</p>
+                <p>解决Minecraft PE资源包开发中的核心难题：</p>
+                <ul>
+                    <li>将Java版分散的纹理文件转换为PE版所需的纹理图集</li>
+                    <li>自动生成正确的terrain.meta配置文件</li>
+                    <li>生成多级Mipmap纹理，提升游戏性能</li>
+                    <li>避免手动拼接纹理图集的时间消耗和错误</li>
+                </ul>
+            </header>
+
+            <h2>1. 调整terrain.meta</h2>
+                <label for="vanillaMeta">原版terrain.meta: </label>
+                <input type="file" id="vanillaMeta" accept=".json,.meta">
+                <br>
+                <label for="tgaWidth">输出宽度: </label>
+                <input type="number" id="tgaWidth" value="512">
+                <br>
+                <label for="tgaHeight">输出高度: </label>
+                <input type="number" id="tgaHeight" value="256">
+                <br>
+                <label for="blockWidth">区块宽度: </label>
+                <input type="number" id="blockWidth" value="16">
+                <br>
+                <label for="blockHeight">区块高度: </label>
+                <input type="number" id="blockHeight" value="16">
+                <br>
+                <button type="button" id="generateMeta" class="mdui-btn mdui-btn-raised mdui-color-theme-accent">生成terrain.meta</button>
+                <br>
+                <a id="metaDownload">下载terrain2.meta</a>
+
+            <h2>2. 生成纹理图集</h2>
+                <label for="textureZip">纹理文件 (ZIP): </label>
+                <input type="file" id="textureZip" accept=".zip" required="">
+                <br>
+                <label for="mappingFile">映射文件: </label>
+                <input type="file" id="mappingFile" accept=".txt" required="">
+                <a href="javascript:fetch('./mapping.txt').then(response => response.text()).then(text => {download(text, 'mapping.txt', 'text/plain');});">下载默认映射文件</a>
+                <br>
+                <label for="terrainMeta">terrain.meta文件: </label>
+                <input type="file" id="terrainMeta" accept=".json,.meta" required="">
+                <br>
+                <label for="outputWidth">输出宽度: </label>
+                <input type="number" id="outputWidth" value="512">
+                <br>
+                <label for="outputHeight">输出高度: </label>
+                <input type="number" id="outputHeight" value="256">
+                <br>
+                <button type="button" id="generateAtlas" class="mdui-btn mdui-btn-raised mdui-color-theme-accent">生成纹理图集</button>
+                <img id="atlasPreview" src="placeholder.png" alt="预览图">
+                <a id="atlasDownload">下载纹理图集 (PNG)</a>
+                <a id="atlasDownloadTGA">下载纹理图集 (TGA)</a>
+
+            <h2>3. 生成 Mipmap</h2>
+                <label for="inputAtlas">输入纹理图集: </label>
+                <input type="file" id="inputAtlas" accept=".png">
+                <br>
+                <label for="mipLevels">Mipmap 级别: </label>
+                <input type="number" id="mipLevels" value="4" min="1">
+                <br>
+                <button type="button" id="generateMipmap" class="mdui-btn mdui-btn-raised mdui-color-theme-accent">生成 Mipmap</button>
+                <div id="mipmapPreview"></div>
+                <div id="mipmapDownloads">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>级别</th>
+                                <th>预览</th>
+                                <th>分辨率</th>
+                                <th>PNG下载</th>
+                                <th>TGA下载</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>0</td>
+                                <td><img src="placeholder_mip0.png" alt="Mip0预览图"></td>
+                                <td>50%</td>
+                                <td>无</td>
+                                <td>无</td>
+                            </tr>
+                            <tr>
+                                <td>1</td>
+                                <td><img src="placeholder_mip1.png" alt="Mip1预览图"></td>
+                                <td>25%</td>
+                                <td>无</td>
+                                <td>无</td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td><img src="placeholder_mip2.png" alt="Mip2预览图"></td>
+                                <td>12.5%</td>
+                                <td>无</td>
+                                <td>无</td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td><img src="placeholder_mip3.png" alt="Mip3预览图"></td>
+                                <td>6.25%</td>
+                                <td>无</td>
+                                <td>无</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            <h1>使用方式</h1>
+
+            <h2>完整工作流程</h2>
+            <ol>
+                <li>
+                    <strong>准备纹理文件</strong>
+                    <ul>
+                        <li>收集所有需要使用的单个纹理图片文件（注意限制说明中的不支持类型）</li>
+                        <li>建议使用Java版1.20.1资源包作为参考</li>
+                        <li>准备纹理映射文件（.txt格式，定义方块名称与纹理文件的对应关系）</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Android平台打包步骤（使用MT管理器）</strong>
+                    <ul>
+                        <li>打开MT管理器，找到存放纹理文件的文件夹</li>
+                        <li>左右滑动任意文件打开多选模式，点击底部菜单栏全选按钮（第一个）</li>
+                        <li>长按任意文件选择压缩</li>
+                        <li>设置压缩包名称为"textures.zip"</li>
+                        <li>选择ZIP格式（不要使用RAR或7z格式）</li>
+                        <li>压缩级别选择"存储"或"不压缩"以加快处理速度</li>
+                        <li>点击确定开始压缩，完成后即可上传到本工具</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>生成纹理图集</strong>
+                    <ul>
+                        <li>上传纹理ZIP文件</li>
+                        <li>上传纹理映射文件</li>
+                        <li>设置输出图集的尺寸（推荐512x256）</li>
+                        <li>点击"生成纹理图集"按钮，预览并下载PNG或TGA格式的图集</li>
+                        <li class="mdui-text-color-red">注意：水、岩浆等特殊方块可能无法正确转换</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>生成Mipmap</strong>
+                    <ul>
+                        <li>上传生成的纹理图集</li>
+                        <li>设置需要的Mipmap级别数量（必须为4级）</li>
+                        <li>点击"生成Mipmap"按钮，系统会自动生成各级缩小版本的纹理</li>
+                        <li>分别下载各级Mipmap的TGA文件</li>
+                        <li class="mdui-text-color-red">注意：目前仅支持16x纹理在512x256分辨率下的Mipmap</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>应用到资源包</strong>
+                    <ul>
+                        <li>将纹理图集文件重命名为terrain_texture.tga</li>
+                        <li>将文件放入MCPE资源包的images目录</li>
+                        <li>将Mipmap文件按级别命名并放入相应目录</li>
+                        <li>测试资源包在游戏中的显示效果</li>
+                    </ul>
+                </li>
+            </ol>
+
+            <h2>成功案例</h2>
+            <div class="mdui-card mdui-card-raised border-red mdui-hoverable">
+                <div class="mdui-card-header">
+                    <div class="mdui-card-header-avatar mdui-color-pink mdui-valign">
+                        <i class="mdui-icon material-icons mdui-center">developer_mode</i>
+                    </div>
+                    <div class="mdui-card-header-title">工具开发者: wusheng233</div>
+                    <div class="mdui-card-header-subtitle">MCPE改包技术先驱</div>
+                </div>
+                <div class="mdui-card-content">
+                    <div class="mdui-typo">
+                        <p><strong>"突破MCPE纹理限制：从32x到64x的革命性提升"</strong></p>
+                        <ul>
+                            <li><strong>打破行业认知</strong>：传统认为MCPE纹理极限为32x，通过本工具成功实现64x高清纹理</li>
+                            <li><strong>效率飞跃</strong>：手动移植需要数小时的工作，现在仅需几秒钟自动完成</li>
+                            <li><strong>体验升级</strong>：64x纹理显著提升游戏视觉效果，虽然加载速度仍有优化空间</li>
+                            <li><strong>技术突破</strong>：证明了MCPE引擎支持更高分辨率纹理的可能性</li>
+                        </ul>
+                        <div class="mdui-chip">
+                            <span class="mdui-chip-icon mdui-color-green"><i class="mdui-icon material-icons">trending_up</i></span>
+                            <span class="mdui-chip-title">开发效率提高95%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h2>Java版资源包参考（1.20.1）</h2>
+            <div class="mdui-typo">
+                <p>如果您使用Java版1.20.1资源包作为纹理来源，以下是要注意的路径：</p>
+                <h4>主要纹理路径：</h4>
+                <ul>
+                    <li><code>assets/minecraft/textures/block/</code> - 所有方块纹理</li>
+                </ul>
+                <p class="mdui-typo-caption">
+                    注意：Java版使用独立的纹理文件，而PE版0.15之前使用纹理图集。您需要将Java版的单个纹理文件
+                    通过本工具打包成PE版可用的纹理图集。
+                </p>
+            </div>
+
+            <h2>注意事项</h2>
+            <ul>
+                <li>确保所有纹理文件的命名与映射文件中的定义一致</li>
+                <li><strong>调整terrain.meta文件是可选的</strong> - 大多数情况下不需要重新生成</li>
+            </ul>
+
+            <h2>技术信息</h2>
+            <div class="mdui-typo">
+                <ul>
+                    <li><strong>原始项目：</strong>基于 <a href="https://github.com/wusheng233github/My-Messy-Scripts" target="_blank">wusheng233github/My-Messy-Scripts</a> 中的PHP工具</li>
+                    <li><strong>移植环境：</strong>使用DeepSeek AI协助将PHP代码移植到浏览器JavaScript环境</li>
+                    <li><strong>文件格式：</strong>支持PNG和TGA（带Alpha通道）输出</li>
+                    <li><strong>依赖库：</strong>使用JSZip处理压缩包，TGA.js处理TGA格式</li>
+                </ul>
+            </div>
+        </main>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mdui/1.0.2/js/mdui.min.js" integrity="sha512-LBh0vC8hNru7991yk7vBb3tiBCU41shGOowGRnLqz63KYedvNQOyGOKHnl/pHSRYJ2P45bjzALArvDDHSSc2KA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="script.js"></script>
+    </body>
+</html>

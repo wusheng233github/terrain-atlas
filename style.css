@@ -1,0 +1,19 @@
+table {
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: left;
+}
+img {
+    display: block;
+    max-width: 100%;
+}
+.d-block {
+    display: block;
+}
+.border-red {
+    border: 2px solid red;
+}
