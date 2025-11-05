@@ -1,0 +1,33 @@
+{
+    "name": "MCPE纹理图集生成器",
+    "start_url": ".",
+    "display": "standalone",
+    "icons": [
+        {
+            "src": "favicon.ico",
+            "type": "image/x-icon",
+            "sizes": "64x64"
+        },
+        {
+            "src": "favicon144.png",
+            "type": "image/png",
+            "sizes": "144x144"
+        }
+    ],
+    "screenshots": [
+        {
+            "src": "screenshot_android.jpg",
+            "sizes": "720x1600",
+            "type": "image/jpeg",
+            "form_factor": "narrow",
+            "platform": "android"
+        },
+        {
+            "src": "screenshot_wide.jpg",
+            "sizes": "1600x720",
+            "type": "image/jpeg",
+            "form_factor": "wide",
+            "platform": "android"
+        }
+    ]
+}
