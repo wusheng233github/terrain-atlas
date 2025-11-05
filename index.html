@@ -74,6 +74,18 @@
                 <label for="outputHeight">输出高度: </label>
                 <input type="number" id="outputHeight" value="256">
                 <br>
+                <label class="mdui-checkbox">
+                    <input type="checkbox" id="floatMode">
+                    <i class="mdui-checkbox-icon"></i>
+                    使用UV坐标比例 (≤0.13.2)
+                </label>
+                <br>
+                <label class="mdui-checkbox">
+                    <input type="checkbox" id="oldKeyMode">
+                    <i class="mdui-checkbox-icon"></i>
+                    使用旧版本格式 (≤0.8.1)
+                </label>
+                <br>
                 <button type="button" id="generateAtlas" class="mdui-btn mdui-btn-raised mdui-color-theme-accent">生成纹理图集</button>
                 <img id="atlasPreview" src="placeholder.png" alt="预览图">
                 <a id="atlasDownload">下载纹理图集 (PNG)</a>

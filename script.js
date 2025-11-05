@@ -89,6 +89,8 @@ document.getElementById('generateAtlas').addEventListener('click', function () {
 
     const outputWidth = parseInt(document.getElementById('outputWidth').value, 10);
     const outputHeight = parseInt(document.getElementById('outputHeight').value, 10);
+    const floatMode = document.getElementById('floatMode').checked;
+    const oldKeyMode = document.getElementById('oldKeyMode').checked;
 
     const mappingReader = new FileReader();
 
@@ -112,7 +114,14 @@ document.getElementById('generateAtlas').addEventListener('click', function () {
                 const drawPromises = [];
 
                 for (const block of meta) {
-                    for (let uvIndex = 0; uvIndex < block.uvs.length; uvIndex++) {
+                    // 不是我拼写错误
+                    const uvs = oldKeyMode ? block.additonal_textures : block.uvs
+
+                    if (oldKeyMode) {
+                        uvs.push(block.uv);
+                    }
+
+                    for (let uvIndex = 0; uvIndex < uvs.length; uvIndex++) {
                         const textureName = table[block.name + '+' + uvIndex];
 
                         if (!textureName) {
@@ -133,11 +142,24 @@ document.getElementById('generateAtlas').addEventListener('click', function () {
                                 return createImageBitmap(blob);
                             })
                             .then(function (img) {
-                                const uv = block.uvs[uvIndex];
+                                const uv = uvs[uvIndex];
+
+                                var x = uv[0];
+                                var y = uv[1];
+                                var width = uv[2] - uv[0];
+                                var height =uv[3] - uv[1];
+
+                                if (floatMode) {
+                                    x *= uv[4];
+                                    y *= uv[5];
+                                    width = Math.round(width * uv[4]);
+                                    height = Math.round(height * uv[5]);
+                                }
+
                                 ctx.drawImage(
                                     img,
-                                    uv[0], uv[1],
-                                    uv[2] - uv[0], uv[3] - uv[1]
+                                    x, y,
+                                    width, height
                                 );
                             });
 
