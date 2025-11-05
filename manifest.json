@@ -29,5 +29,6 @@
             "form_factor": "wide",
             "platform": "android"
         }
-    ]
+    ],
+    "theme_color": "#00796B"
 }
