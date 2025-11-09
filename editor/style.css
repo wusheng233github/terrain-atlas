@@ -1,0 +1,277 @@
+:root {
+    --bottom-panel-height: 48px;
+    --bottom-panel-background: #272727;
+    --bottom-panel-border: #444;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #000;
+    color: #fff;
+    width: 100vw;
+}
+
+#previewCanvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: calc(100% - var(--bottom-panel-height));
+    background-color: #000;
+    cursor: move;
+}
+
+#bottomPanel {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: var(--bottom-panel-height);
+    background-color: var(--bottom-panel-background);
+    border-top: 1px solid var(--bottom-panel-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 12px;
+    z-index: 1;
+    overflow-x: auto;
+}
+
+.panel-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.btn-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn {
+    width: 48px;
+    height: 32px;
+    background-color: #555;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+}
+
+.btn.宽 {
+    width: 96px;
+}
+
+.btn.高 {
+    height: 36px;
+}
+
+.btn.扁 {
+    height: 24px;
+}
+
+.btn.方 {
+    height: 32px;
+    width: 32px;
+}
+
+.btn.方.大 {
+    height: 48px;
+    width: 48px;
+}
+
+.btn.方.小 {
+    height: 24px;
+    width: 24px;
+}
+
+.btn:hover {
+    background-color: #666;
+}
+
+.file-input {
+    display: none;
+}
+
+.file-status {
+    color: #bbb;
+    font-size: 12px;
+    margin-left: 4px;
+}
+
+.panel-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.bg-controls {
+    display: flex;
+    gap: 8px;
+    margin-right: 8px;
+}
+
+.bg-btn {
+    width: 28px;
+    height: 28px;
+    border: 2px solid #555;
+    cursor: pointer;
+}
+
+.bg-btn.black {
+    background-color: #000;
+}
+
+.bg-btn.white {
+    background-color: #fff;
+}
+
+.bg-btn.gray {
+    background-color: #808080;
+}
+
+.bg-btn.active {
+    border-color: #fff;
+}
+
+.info-btn {
+    width: 36px;
+    height: 36px;
+    background-color: #444;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-family: 'Courier New', Courier, monospace;
+    box-shadow: #000 0 2px 4px;
+}
+
+.info-btn:hover {
+    background-color: #555;
+}
+
+.info-btn.active {
+    background-color: #0066cc;
+}
+
+.popup-panel {
+    position: absolute;
+    width: 400px;
+    max-height: calc(100% - var(--bottom-panel-height) - 8px);
+    background-color: var(--bottom-panel-background);
+    border: 1px solid var(--bottom-panel-border);
+    padding: 12px;
+    overflow-y: auto;
+    z-index: 1;
+    display: none;
+    box-shadow: 0 2px 6px black;
+}
+
+.popup-panel.active {
+    display: block;
+}
+
+.popup-panel.窄 {
+    width: 280px;
+}
+
+.popup-panel.宽 {
+    width: 640px;
+}
+
+.popup-panel.上 {
+    top: 8px;
+}
+
+.popup-panel.下 {
+    bottom: calc(var(--bottom-panel-height) + 8px);
+}
+
+.popup-panel.左 {
+    left: 12px;
+}
+
+.popup-panel.右 {
+    right: 12px;
+}
+
+.popup-panel.中 {
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+#info {
+    white-space: pre-wrap;
+    font-family: monospace;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.drop-zone {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: calc(100% - var(--bottom-panel-height));
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.75);
+    z-index: 20;
+    border: 4px dashed #0066cc;
+    color: #fff;
+    font-size: 24px;
+    text-align: center;
+    pointer-events: none;
+}
+
+.hint-label {
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.75);
+    padding: 4px 12px;
+    font-size: 12px;
+    color: #ccc;
+    display: none;
+    z-index: 1;
+}
+
+.hint-label.active {
+    display: block;
+}
+
+.hint-label.上 {
+    top: 12px;
+}
+
+.hint-label.下 {
+    bottom: 12px;
+}
+
+.hint-label.左 {
+    left: 12px;
+}
+
+.hint-label.右 {
+    right: 12px;
+}
+
+#previewImage {
+    margin-top: 4px;
+    image-rendering: pixelated;
+    height: 48px;
+    display: none;
+}

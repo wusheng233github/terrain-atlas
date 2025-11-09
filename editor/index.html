@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>TGA预览器</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=0">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <script src="../tga.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"
+        integrity="sha512-XMVd28F1oH/O71fzwBnV7HucLxVwtxf26XV8P4wPk26EDxuGZ91N8bsOttmnomcCD3CS5ZMRL50H0GgOHvegtg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/downloadjs/1.4.8/download.min.js"
+        integrity="sha512-WiGQZv8WpmQVRUFXZywo7pHIO0G/o3RyiAJZj8YXNN4AV7ReR1RYWVmZJ6y3H06blPcjJmG/sBpOVZjTSFFlzQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+
+<body>
+    <canvas id="previewCanvas"></canvas>
+
+    <div id="dropZone" class="drop-zone">
+        拖放TGA或META文件到此处
+    </div>
+
+    <div id="shortcutHint" class="hint-label 左 上"></div>
+    <div id="formatInfo" class="hint-label 右 上 active">
+        <p id="time">时间</p>
+        <p>测试版，TODO:</p>
+        <p>编辑功能</p>
+        <p>&emsp;编辑UV (50%)</p>
+        <p>&emsp;编辑映射 (40%)</p>
+        <p>&emsp;编辑图集大小</p>
+        <p>浏览</p>
+        <p>&emsp;动态纹理</p>
+        <!--<p>&emsp;双指缩放时移动 ✔</p>-->
+        <p>导入导出</p>
+        <p>&emsp;导入PNG纹理图集</p>
+        <!--<p>&emsp;导出元数据 ✔</p>
+        <p>&emsp;导出图集 ✔</p>
+        <p>&emsp;导出纹理包</p>
+        <p>应用映射文件 ✔</p>
+        <p>Mipmap生成工具 ✔</p>-->
+        <a href="manual.html">使用说明</a>
+    </div>
+
+    <div id="bottomPanel">
+        <div class="panel-left">
+            <div class="btn-controls">
+                <button id="tgaBtn" class="btn 高" title="加载TGA文件">TGA</button>
+                <input type="file" id="tgaFile" class="file-input" accept=".tga">
+                <div class="file-status" id="tgaStatus">未加载</div>
+            </div>
+
+            <div class="btn-controls">
+                <button id="metaBtn" class="btn 高" title="加载META文件">META</button>
+                <input type="file" id="metaFile" class="file-input" accept=".meta">
+                <div class="file-status" id="metaStatus">未加载</div>
+            </div>
+
+            <div class="btn-controls">
+                <button id="mappingBtn" class="btn 高" title="加载映射文件">映射</button>
+                <input type="file" id="mappingFile" class="file-input" accept=".txt">
+                <div class="file-status" id="mappingStatus">未加载</div>
+            </div>
+
+            <div class="btn-controls">
+                <button id="zipBtn" class="btn 高" title="加载纹理包">ZIP</button>
+                <input type="file" id="zipFile" class="file-input" accept=".zip">
+                <div class="file-status" id="zipStatus">未加载</div>
+            </div>
+        </div>
+
+        <div class="panel-right">
+            <div class="bg-controls">
+                <button class="bg-btn black active" title="黑色背景 (B)"></button>
+                <button class="bg-btn white" title="白色背景 (B)"></button>
+                <button class="bg-btn gray" title="灰色背景 (B)"></button>
+            </div>
+
+            <button id="infoBtn" class="info-btn active" title="显示详细信息 (I)">i</button>
+        </div>
+    </div>
+
+    <div id="infoPopup" class="popup-panel 右 下 active">
+        <div id="info">请加载TGA文件和对应的META文件</div>
+        <img id="previewImage">
+    </div>
+
+    <script src="script.js"></script>
+    <script src="mipmap.js"></script>
+    <script src="TexturePackLoader.js"></script>
+    <script src="editor.js"></script>
+    <script src="mapping.js"></script>
+</body>
+
+</html>
