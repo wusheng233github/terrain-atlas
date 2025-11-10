@@ -1,9 +1,15 @@
 // 全局变量
-let TGA编解码器 = null, 全局元数据 = null, 映射数据 = null;
+let 全局元数据 = null;
+let 映射数据 = null;
 let canvas = document.getElementById('previewCanvas');
 let ctx = canvas.getContext('2d');
-let scale = 1, offsetX = 0, offsetY = 0;
-let 正在拖动画面 = false, lastX = 0, lastY = 0, 全局图集 = null;  // android webview背景始终为黑色
+let scale = 1;
+let offsetX = 0;
+let offsetY = 0;
+let 正在拖动画面 = false;
+let lastX = 0;
+let lastY = 0;
+let 全局图集 = null; // FIXME: pixelstudio导出背景为黑色
 let 选中方块 = null, 选中的UV编号 = -1;
 let 信息弹窗是否显示 = true;
 let 背景颜色 = ['black', 'white', '#808080'];
@@ -11,6 +17,51 @@ let 当前背景颜色编号 = 0;
 let 纹理包 = {};
 let 画面更新事件监听 = []; // 无参数
 let 方块选中事件监听 = []; // 去找选中方块
+const moveStep = 30;
+const zoomStep = 0.1;
+
+const 快捷键管理器 = {
+    回调列表: {},
+    注册快捷键: function (按键码列表, 回调, 描述 = '') {
+        if (typeof 按键码列表 === 'string') {
+            按键码列表 = [按键码列表];
+        }
+        按键码列表.forEach(按键码 => {
+            this.回调列表[按键码.toLowerCase()] = {
+                回调: 回调,
+                描述: 描述
+            };
+        });
+    },
+    按键按下: function (按键码) {
+        按键码 = 按键码.toLowerCase();
+        if (this.回调列表[按键码]) {
+            this.回调列表[按键码].回调();
+            return true;
+        }
+        return false;
+    },
+    批量注册快捷键: function (回调列表) {
+        for (let 按键码 in 回调列表) {
+            let 配置 = 回调列表[按键码];
+
+            if (typeof 配置 === 'string') {
+                if (this.回调列表[配置]) {
+                    配置 = this.回调列表[配置]
+                } else {
+                    continue;
+                }
+            } else if (typeof 配置 !== 'object') {
+                continue;
+            }
+            this.注册快捷键(
+                按键码,
+                配置.回调,
+                配置.描述 || ''
+            );
+        }
+    }
+};
 
 // 调整Canvas大小以适应窗口
 function resizeCanvas() {
@@ -24,22 +75,29 @@ function resizeCanvas() {
 window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
 
+function 按钮绑定文件输入(按钮的id, 文件输入的id) {
+    document.getElementById(按钮的id).addEventListener('click', function () {
+        document.getElementById(文件输入的id).click();
+    });
+    // TODO: 拖放
+}
+
+function 文件输入绑定文件名标签(文件输入的id, 文件名标签的id, 回调) {
+    document.getElementById(文件输入的id).addEventListener('change', function (e) {
+        const 选择的文件 = e.target.files[0];
+        if (!选择的文件) {
+            return;
+        }
+        document.getElementById(文件名标签的id).textContent = 选择的文件.name;
+        回调(选择的文件);
+    });
+}
+
 // 文件按钮事件
-document.getElementById('tgaBtn').addEventListener('click', function () {
-    document.getElementById('tgaFile').click();
-});
-
-document.getElementById('metaBtn').addEventListener('click', function () {
-    document.getElementById('metaFile').click();
-});
-
-document.getElementById('mappingBtn').addEventListener('click', function () {
-    document.getElementById('mappingFile').click();
-});
-
-document.getElementById('zipBtn').addEventListener('click', function () {
-    document.getElementById('zipFile').click();
-});
+按钮绑定文件输入('tgaBtn', 'tgaFile');
+按钮绑定文件输入('metaBtn', 'metaFile');
+按钮绑定文件输入('mappingBtn', 'mappingFile');
+按钮绑定文件输入('zipBtn', 'zipFile');
 
 // 信息按钮事件
 document.getElementById('infoBtn').addEventListener('click', function () {
@@ -47,47 +105,17 @@ document.getElementById('infoBtn').addEventListener('click', function () {
 });
 
 // 文件加载
-document.getElementById('tgaFile').addEventListener('change', function (e) {
-    const 选择的文件 = e.target.files[0];
-    if (!选择的文件) {
-        return;
-    }
-    document.getElementById('tgaStatus').textContent = 选择的文件.name;
-    加载图集(选择的文件);
-});
+文件输入绑定文件名标签('tgaFile', 'tgaStatus', 加载图集);
+文件输入绑定文件名标签('metaFile', 'metaStatus', 加载元数据);
+文件输入绑定文件名标签('mappingFile', 'mappingStatus', 加载映射文件);
+文件输入绑定文件名标签('zipFile', 'zipStatus', 导入纹理包);
 
-document.getElementById('metaFile').addEventListener('change', function (e) {
-    const 选择的文件 = e.target.files[0];
-    if (!选择的文件) {
-        return;
-    }
-    document.getElementById('metaStatus').textContent = 选择的文件.name;
-    加载元数据(选择的文件);
-});
-
-document.getElementById('mappingFile').addEventListener('change', function (e) {
-    const 选择的文件 = e.target.files[0];
-    if (!选择的文件) {
-        return;
-    }
-    document.getElementById('mappingStatus').textContent = 选择的文件.name;
-    加载映射文件(选择的文件);
-});
-
-document.getElementById('zipFile').addEventListener('change', function (e) {
-    const 选择的文件 = e.target.files[0];
-    if (!选择的文件) {
-        return;
-    }
-    document.getElementById('zipStatus').textContent = 选择的文件.name;
-    导入纹理包(选择的文件);
-});
 
 function 加载图集(file) {
     const reader = new FileReader();
     reader.onload = function (event) {
         const arrayBuffer = event.target.result;
-        TGA编解码器 = new window.TGA();
+        let TGA编解码器 = new window.TGA();
         TGA编解码器.load(arrayBuffer);
         const 图像数据 = TGA编解码器.getImageData();
         createImageBitmap(图像数据).then(function (位图) {
@@ -267,7 +295,7 @@ function 设置画面背景(编号) {
     document.querySelectorAll('.bg-btn').forEach((btn, i) => {
         btn.classList.toggle('active', i === 编号);
     });
-
+    当前背景颜色编号 = 编号;
     canvas.style.backgroundColor = 背景颜色[编号];
     更新画面();
 }
@@ -719,79 +747,84 @@ document.addEventListener('drop', function (e) {
     }
 });
 
-// 快捷键功能
 document.addEventListener('keydown', function (e) {
-    if (e.target.tagName === 'INPUT') return;
-    const moveStep = 30;
-    const zoomStep = 0.1;
+    if (e.target.tagName === 'INPUT') {
+        return;
+    }
+    if (快捷键管理器.按键按下(e.key)) {
+        e.preventDefault();
+    }
+});
 
-    switch (e.key) {
-        case 'b':
-        case 'B':
-            e.preventDefault();
+快捷键管理器.批量注册快捷键({
+    'b': {
+        回调: function () {
             切换背景();
             显示快捷键提示('已切换背景颜色');
-            break;
-
-        case 'i':
-        case 'I':
-            e.preventDefault();
+        },
+        描述: '切换背景颜色'
+    },
+    'i': {
+        回调: function () {
             切换信息弹窗();
             显示快捷键提示(信息弹窗是否显示 ? '显示信息面板' : '隐藏信息面板');
-            break;
-
-        case 'ArrowUp':
-            e.preventDefault();
+        },
+        描述: '展开详细信息'
+    },
+    'ArrowUp': {
+        回调: function () {
             offsetY += moveStep;
             更新画面();
-            break;
-
-        case 'ArrowDown':
-            e.preventDefault();
+        },
+        描述: '向上移动画面'
+    },
+    'ArrowDown': {
+        回调: function () {
             offsetY -= moveStep;
             更新画面();
-            break;
-
-        case 'ArrowLeft':
-            e.preventDefault();
+        },
+        描述: '向下移动画面'
+    },
+    'ArrowLeft': {
+        回调: function () {
             offsetX += moveStep;
             更新画面();
-            break;
-
-        case 'ArrowRight':
-            e.preventDefault();
+        },
+        描述: '向左移动画面'
+    },
+    'ArrowRight': {
+        回调: function () {
             offsetX -= moveStep;
             更新画面();
-            break;
-
-        case '+':
-        case '=':
-            if (e.shiftKey || e.code === 'NumpadAdd') {
-                e.preventDefault();
-                const oldScale = scale;
-                scale = Math.min(scale * (1 + zoomStep), 10);
-                offsetX = offsetX - (offsetX * (scale - oldScale) / oldScale);
-                offsetY = offsetY - (offsetY * (scale - oldScale) / oldScale);
-                更新画面();
-                显示快捷键提示(`放大至 ${scale.toFixed(2)}x`);
-            }
-            break;
-
-        case '-':
-        case '_':
-            if (!e.shiftKey || e.code === 'NumpadSubtract') {
-                e.preventDefault();
-                const oldScale = scale;
-                scale = Math.max(scale * (1 - zoomStep), 0.1);
-                offsetX = offsetX - (offsetX * (scale - oldScale) / oldScale);
-                offsetY = offsetY - (offsetY * (scale - oldScale) / oldScale);
-                更新画面();
-                显示快捷键提示(`缩小至 ${scale.toFixed(2)}x`);
-            }
-            break;
-        case 'd':
-        case 'D':
-            e.preventDefault();
+        },
+        描述: '向右移动画面'
+    },
+    '+': {
+        回调: function () {
+            const oldScale = scale;
+            scale = Math.min(scale * (1 + zoomStep), 10);
+            offsetX = offsetX - (offsetX * (scale - oldScale) / oldScale);
+            offsetY = offsetY - (offsetY * (scale - oldScale) / oldScale);
+            更新画面();
+            显示快捷键提示(`放大至 ${scale.toFixed(2)}x`);
+        },
+        描述: '放大画面'
+    },
+    '=': '+',
+    '-': {
+        回调: function () {
+            const oldScale = scale;
+            scale = Math.max(scale * (1 - zoomStep), 0.1);
+            offsetX = offsetX - (offsetX * (scale - oldScale) / oldScale);
+            offsetY = offsetY - (offsetY * (scale - oldScale) / oldScale);
+            更新画面();
+            显示快捷键提示(`缩小至 ${scale.toFixed(2)}x`);
+        },
+        描述: '缩小画面'
+    },
+    '_': '_',
+    'd': {
+        回调: function () {
             if (typeof 已加载开发资源 === 'undefined') {
                 更新信息栏('开发资源未加载，正在引入dev.js');
                 const script = document.createElement('script');
@@ -806,42 +839,8 @@ document.addEventListener('keydown', function (e) {
             } else {
                 更新信息栏("已加载开发资源");
             }
-            break;
-        case 't':
-        case 'T':
-            e.preventDefault();
-            if (typeof 已加载纹理包加载器 === 'undefined') {
-                更新信息栏('正在引入TexturePackLoader.js');
-                const script = document.createElement('script');
-                script.src = 'TexturePackLoader.js';
-                script.onload = function () {
-                    更新信息栏('加载了纹理包加载器');
-                };
-                script.onerror = function () {
-                    更新信息栏('纹理包加载器加载失败');
-                };
-                document.head.appendChild(script);
-            } else {
-                更新信息栏("已加载纹理包加载器");
-            }
-            break;
-        case 'm':
-        case 'M':
-            e.preventDefault();
-            if (typeof 已加载mipmap生成 === 'undefined') {
-                更新信息栏('正在引入mipmap.js');
-                const script = document.createElement('script');
-                script.src = 'mipmap.js';
-                script.onload = function () {
-                    更新信息栏('加载了mipmap生成');
-                };
-                script.onerror = function () {
-                    更新信息栏('mipmap生成加载失败');
-                };
-                document.head.appendChild(script);
-            } else {
-                更新信息栏("已加载mipmap生成");
-            }
+        },
+        描述: '加载UI演示资源'
     }
 });
 

@@ -44,35 +44,6 @@ const 样式 = document.createElement('style');
         border-color: #0066cc;
     }
 
-    .mapping-list-container {
-        flex: 1;
-        max-height: 300px;
-        overflow-y: auto;
-        border: 1px solid #555;
-        background: #222;
-        margin-bottom: 12px;
-    }
-
-    .mapping-item {
-        display: flex;
-        align-items: center;
-        padding: 4px 8px;
-        border-bottom: 1px solid #333;
-        cursor: pointer;
-    }
-
-    .mapping-item:hover {
-        background-color: #444;
-    }
-
-    .mapping-item.selected {
-        background-color: #0066cc;
-    }
-
-    .mapping-item.selected:hover {
-        background-color: #1e82e6 !important;
-    }
-
     .mapping-icon {
         width: 32px;
         height: 32px;
@@ -133,7 +104,7 @@ function 初始化映射编辑器() {
         <div class="mapping-input-container">
             <input type="text" id="mappingInput" placeholder="输入PNG文件名或搜索..." autocomplete="off">
         </div>
-        <div class="mapping-list-container">
+        <div class="list-container">
             <div id="mappingList">
                 <!-- 映射列表将在这里动态生成 -->
             </div>
@@ -160,9 +131,9 @@ function 初始化映射编辑器() {
             关闭映射编辑器();
         } else if (e.key === 'ArrowDown') {
             e.preventDefault();
-            const 项目列表 = 映射列表容器.querySelectorAll('.mapping-item');
+            const 项目列表 = 映射列表容器.querySelectorAll('.list-item');
             if (项目列表.length > 0) {
-                const 当前选中 = 映射列表容器.querySelector('.mapping-item.selected');
+                const 当前选中 = 映射列表容器.querySelector('.list-item.selected');
                 let 下一个索引 = 0;
                 if (当前选中) {
                     const 当前索引 = Array.from(项目列表).indexOf(当前选中);
@@ -172,9 +143,9 @@ function 初始化映射编辑器() {
             }
         } else if (e.key === 'ArrowUp') {
             e.preventDefault();
-            const 项目列表 = 映射列表容器.querySelectorAll('.mapping-item');
+            const 项目列表 = 映射列表容器.querySelectorAll('.list-item');
             if (项目列表.length > 0) {
-                const 当前选中 = 映射列表容器.querySelector('.mapping-item.selected');
+                const 当前选中 = 映射列表容器.querySelector('.list-item.selected');
                 let 上一个索引 = 项目列表.length - 1;
                 if (当前选中) {
                     const 当前索引 = Array.from(项目列表).indexOf(当前选中);
@@ -202,7 +173,7 @@ function 初始化映射编辑器() {
 // 选择映射项目
 function 选择映射项目(项目元素) {
     // 移除其他项的选中状态
-    document.querySelectorAll('.mapping-item').forEach(item => {
+    document.querySelectorAll('.list-item').forEach(item => {
         item.style.backgroundColor = '';
         item.classList.remove('selected');
     });
@@ -320,7 +291,7 @@ function 生成映射列表() {
 
     过滤后的文件.forEach((文件名, 索引) => {
         const 列表项 = document.createElement('div');
-        列表项.className = 'mapping-item';
+        列表项.className = 'list-item 紧凑';
 
         // 如果此项与当前输入完全匹配，则选中
         if (文件名.toLowerCase() === 当前映射值) {

@@ -183,15 +183,19 @@ document.getElementById('generateAtlas').addEventListener('click', function () {
                         downloadLink.textContent = '下载纹理图集 (PNG)';
                     });
 
-                    // 生成TGA下载（带Alpha通道）
-                    generateTGAFromCanvas(canvas, function (tgaBlob) {
-                        const tgaUrl = URL.createObjectURL(tgaBlob);
-                        const tgaDownloadLink = document.getElementById('atlasDownloadTGA');
-                        tgaDownloadLink.href = tgaUrl;
-                        tgaDownloadLink.download = 'output.tga';
-                        tgaDownloadLink.style.display = 'inline';
-                        tgaDownloadLink.textContent = '下载纹理图集 (TGA)';
-                    });
+                    try {
+                        canvas生成TGA(canvas, function (tgaBlob) {
+                            const tgaUrl = URL.createObjectURL(tgaBlob);
+                            const tgaDownloadLink = document.getElementById('atlasDownloadTGA');
+                            tgaDownloadLink.href = tgaUrl;
+                            tgaDownloadLink.download = 'output.tga';
+                            tgaDownloadLink.style.display = 'inline';
+                            tgaDownloadLink.textContent = '下载纹理图集 (TGA)';
+                        });
+                    } catch (error) {
+                        console.error('生成TGA文件时出错:', error);
+                        snackbar('生成TGA文件时出错: ' + error.message);
+                    }
 
                     snackbar('已生成纹理图集！');
                 });
@@ -312,7 +316,7 @@ document.getElementById('generateMipmap').addEventListener('click', function () 
                 // TGA下载列
                 const tgaDownloadCell = document.createElement('td');
 
-                generateTGAFromCanvas(mipmap.canvas, function (tgaBlob) {
+                canvas生成TGA(mipmap.canvas, function (tgaBlob) {
                     const tgaUrl = URL.createObjectURL(tgaBlob);
 
                     const tgaDownloadLink = document.createElement('a');
@@ -360,44 +364,4 @@ function decodeProperties(properties) {
     }
 
     return result;
-}
-
-// ===========================
-// 生成TGA文件（带Alpha通道）
-// ===========================
-function generateTGAFromCanvas(canvas, callback) {
-    const width = canvas.width;
-    const height = canvas.height;
-
-    // 获取Canvas的ImageData
-    const ctx = canvas.getContext('2d');
-    const imageData = ctx.getImageData(0, 0, width, height);
-
-    // 创建TGA头部
-    const header = {
-        imageType: window.TGA.Type.RGB, // 使用RGB类型但包含Alpha
-        pixelDepth: 32, // 32位包含Alpha通道
-        width: width,
-        height: height,
-        flags: (window.TGA.Origin.TOP_LEFT << window.TGA.Origin.SHIFT) | 8 // 包含8位Alpha通道
-    };
-
-    // 创建TGA实例
-    const tga = new window.TGA(header);
-
-    try {
-        // 设置图像数据
-        tga.setImageData(imageData);
-
-        // 获取TGA的ArrayBuffer
-        const tgaArrayBuffer = tga.arrayBuffer;
-
-        // 创建Blob
-        const tgaBlob = new Blob([tgaArrayBuffer], { type: 'image/x-tga' });
-
-        callback(tgaBlob);
-    } catch (error) {
-        console.error('生成TGA文件时出错:', error);
-        snackbar('生成TGA文件时出错: ' + error.message);
-    }
 }

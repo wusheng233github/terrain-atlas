@@ -22,6 +22,9 @@ function 创建UI演示面板() {
                     <button class="btn 方">方按钮</button>
                     <button class="btn 方 大">大方按钮</button>
                     <button class="btn 宽">宽按钮</button>
+                    <button class="btn 宽 primary">重要按钮</button>
+                    <button class="btn 宽 active">已激活按钮</button>
+                    <button class="btn 宽 primary active">已激活重要的按钮</button>
                 </div>
             </div>
             <!-- 右侧：面板位置演示 -->
@@ -38,6 +41,13 @@ function 创建UI演示面板() {
                     <button class="btn" onclick="切换面板尺寸('窄')">窄面板</button>
                     <button class="btn" onclick="切换面板尺寸('正常')">正常面板</button>
                     <button class="btn" onclick="切换面板尺寸('宽')">宽面板</button>
+                </div>
+                <div class="list-container">
+                    列表容器
+                    <div class="list-item">列表项目</div>
+                    <div class="list-item selected">选中的列表项目</div>
+                    <div class="list-item 紧凑">紧凑的列表项目</div>
+                    <div class="list-item 紧凑 selected">选中的紧凑列表项目</div>
                 </div>
             </div>
         </div>

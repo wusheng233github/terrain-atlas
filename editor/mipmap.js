@@ -145,8 +145,8 @@ function 导出mipmaps() {
 
     console.time('导出zip');
     mipmaps.forEach((mipmap, index) => {
-        mipmap.canvas.toBlob(function (blob) {
-            zip.file(`terrain-atlas_mip${index}.png`, blob);
+        canvas生成TGA(mipmap.canvas, function (blob) {
+            zip.file(`terrain-atlas_mip${index}.tga`, blob);
             processed++;
 
             // 如果是最后一个，生成ZIP文件
