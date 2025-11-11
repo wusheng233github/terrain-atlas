@@ -35,9 +35,10 @@ function 更新控制点() {
     const uv = 选中方块.uvs[选中的UV编号];
     const x = uv[0], y = uv[1], w = uv[2] - uv[0], h = uv[3] - uv[1];
 
+    // 2x2可点击
     控制点列表 = 控制点位置.map(([rx, ry]) => ({
-        x: x + w * rx,
-        y: y + h * ry
+        x: x + w * rx - 0.5,
+        y: y + h * ry - 0.5
     }));
 }
 
@@ -54,7 +55,7 @@ function 绘制控制点() {
     // 绘制控制点
     控制点列表.forEach((点, 索引) => {
         ctx.fillStyle = 索引 === 选中控制点索引 ? '#ffff00' : '#00ff00';
-        ctx.fillRect(点.x - 0.5, 点.y - 0.5, 控制点大小, 控制点大小);
+        ctx.fillRect(点.x, 点.y, 控制点大小, 控制点大小);
     });
 
     ctx.restore();
@@ -162,7 +163,7 @@ const 原处理点击事件 = 处理点击事件;
         // 检查是否点击了控制点
         选中控制点索引 = 检查控制点点击(图像X, 图像Y);
         if (选中控制点索引 === -1) {
-            return 原处理点击事件(x, y)
+            return 原处理点击事件(x, y);
         } else if (选中方块) {
             正在拖动控制点 = true;
             更新画面();

@@ -26,6 +26,7 @@ function 创建UI演示面板() {
                     <button class="btn 宽 active">已激活按钮</button>
                     <button class="btn 宽 primary active">已激活重要的按钮</button>
                 </div>
+                <code class="key-code">代码</code>
             </div>
             <!-- 右侧：面板位置演示 -->
             <div>
@@ -143,18 +144,22 @@ function 切换UI演示() {
 }
 
 // 绑定U键事件
-document.addEventListener('keydown', function (e) {
-    if (e.target.tagName === 'INPUT') return;
-    if (e.key === 'u' || e.key === 'U') {
-        e.preventDefault();
-        切换UI演示();
-        显示快捷键提示((document.getElementById('uiDemoPanel') ? '显示' : '隐藏') + 'UI演示');
-    } else if (e.key === 's' || e.key === 'S') {
-        e.preventDefault();
-        if (全局元数据) {
-            download(JSON.stringify(全局元数据), 'terrain.meta', 'text/plain');
-        }
+快捷键管理器.批量注册快捷键({
+    'u': {
+        回调: function () {
+            切换UI演示();
+            显示快捷键提示((document.getElementById('uiDemoPanel') ? '显示' : '隐藏') + 'UI演示');
+        },
+        描述: '打开UI演示'
+    },
+    'c': {
+        回调: function () {
+            if (全局元数据) {
+                download(JSON.stringify(全局元数据), 'terrain.meta', 'text/plain');
+            } else {
+                更新信息栏('未加载元数据');
+            }
+        },
+        描述: '导出元数据'
     }
 });
-
-更新信息栏('开发资源已加载 (U键显示UI演示)');

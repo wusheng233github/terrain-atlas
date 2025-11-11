@@ -47,7 +47,7 @@ const 快捷键管理器 = {
 
             if (typeof 配置 === 'string') {
                 if (this.回调列表[配置]) {
-                    配置 = this.回调列表[配置]
+                    配置 = this.回调列表[配置];
                 } else {
                     continue;
                 }
@@ -68,7 +68,7 @@ function resizeCanvas() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight - 48;
     if (全局图集) {
-        更新画面()
+        更新画面();
     }
 }
 
@@ -840,7 +840,7 @@ document.addEventListener('keydown', function (e) {
                 更新信息栏("已加载开发资源");
             }
         },
-        描述: '加载UI演示资源'
+        描述: '加载开发资源'
     }
 });
 
@@ -855,11 +855,11 @@ function 显示快捷键提示(message) {
 }
 
 function 补一个零(num) {
-    return num < 10 ? "0" + num : num
+    return num < 10 ? "0" + num : num;
 }
 
 const 时间 = document.getElementById("time");
 setInterval(function () {
     const 日期 = new Date();
-    时间.innerText = `${日期.getFullYear()}/${补一个零(日期.getMonth())}/${补一个零(日期.getDay())} ${补一个零(日期.getHours())}:${补一个零(日期.getMinutes())}:${补一个零(日期.getSeconds())}`;
+    时间.innerText = `${日期.getFullYear()}/${补一个零(日期.getMonth() + 1)}/${补一个零(日期.getDate())} ${补一个零(日期.getHours())}:${补一个零(日期.getMinutes())}:${补一个零(日期.getSeconds())}`;
 }, 1000);

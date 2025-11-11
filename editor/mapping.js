@@ -160,14 +160,6 @@ function 初始化映射编辑器() {
     映射输入框.addEventListener('input', function () {
         生成映射列表();
     });
-
-    // 点击弹窗外部关闭
-    document.addEventListener('click', function (e) {
-        if (映射编辑弹窗 && 映射编辑弹窗.classList.contains('active') &&
-            !映射编辑弹窗.contains(e.target)) {
-            关闭映射编辑器();
-        }
-    });
 }
 
 // 选择映射项目
@@ -217,7 +209,6 @@ function 打开映射编辑器() {
     生成映射列表();
 
     // 显示弹窗
-    映射编辑弹窗.style.display = 'block';
     映射编辑弹窗.classList.add('active');
 
     // 聚焦输入框
@@ -246,7 +237,6 @@ function 关闭映射编辑器() {
     }
 
     // 隐藏弹窗
-    映射编辑弹窗.style.display = 'none';
     映射编辑弹窗.classList.remove('active');
 
     // 更新纹理预览
@@ -392,21 +382,26 @@ function 切换映射编辑器() {
     }
 }
 
-// 添加键盘快捷键
-document.addEventListener('keydown', function (e) {
-    if (e.target.tagName === 'INPUT') return;
-    // A键 - 切换映射编辑器
-    if ((e.key === 'a' || e.key === 'A') && !e.ctrlKey && !e.altKey && !e.metaKey) {
-        e.preventDefault();
-        切换映射编辑器();
-    }
+function 重写编辑器的鼠标点击事件处理() {
+    const 原处理点击事件 = 处理点击事件;
 
-    // C键 - 导出映射文件
-    if ((e.key === 'c' || e.key === 'C') && !e.ctrlKey && !e.altKey && !e.metaKey) {
-        e.preventDefault();
-        导出映射文件();
+    处理点击事件 = function (x, y) {
+        if (映射编辑弹窗 && 映射编辑弹窗.classList.contains('active')) {
+            return true;
+        }
+        return 原处理点击事件(x, y);
+    };
+}
+
+重写编辑器的鼠标点击事件处理();
+
+快捷键管理器.批量注册快捷键({
+    'a': {
+        回调: 切换映射编辑器,
+        描述: '打开映射编辑器'
+    },
+    's': {
+        回调: 导出映射文件,
+        描述: '导出映射文件'
     }
 });
-
-// 更新信息栏显示映射编辑功能已加载
-//更新信息栏('映射编辑功能已加载\n按 A 键打开/关闭映射编辑器\n按 C 键导出映射文件');

@@ -28,7 +28,7 @@ function 从纹理包覆盖图集() {
             const 映射ID = `${方块.name}+${uv索引}`;
             const 纹理文件名 = 映射数据[映射ID];
 
-            if (纹理文件名 && 纹理包[纹理文件名.toLowerCase()]) {
+            if (纹理文件名 && 纹理包[纹理文件名.toLowerCase()]) { // TODO: 支持tga格式，可能用某种元数据重定向，可能有某种随机纹理选择
                 const 加载Promise = new Promise((resolve) => {
                     const img = new Image();
                     img.onload = function () {
@@ -38,8 +38,28 @@ function 从纹理包覆盖图集() {
                         const width = uv[2] - uv[0];
                         const height = uv[3] - uv[1];
 
-                        // 在离屏Canvas上绘制纹理
-                        离屏ctx.drawImage(img, x, y, width, height);
+                        离屏ctx.clearRect(x, y, width, height);
+
+                        // 检查图片比例，如果图片更高则裁剪顶部
+                        const 图片比例 = img.width / img.height;
+                        const 目标比例 = width / height;
+
+                        if (图片比例 < 目标比例) { // XXX: 应该读取meta文件，如果有animation，绘制高度为图片高度/animation.frames.length，sy为帧0的索引*绘制高度，但是现在只有png后缀的文件加载到内存
+                            // 图片更高，需要裁剪顶部
+                            const 缩放宽度 = img.width;
+                            const 缩放高度 = img.width / 目标比例;
+
+                            // 绘制裁剪后的图片（只保留顶部部分）
+                            离屏ctx.drawImage(
+                                img,
+                                0, 0, 缩放宽度, 缩放高度, // 源图像裁剪区域
+                                x, y, width, height      // 目标绘制区域
+                            );
+                        } else {
+                            // 图片更宽或比例相同，直接绘制
+                            离屏ctx.drawImage(img, x, y, width, height); // TODO: 可能用某种数据设置特殊的模型
+                        }
+
                         覆盖数量++;
                         resolve();
                     };
@@ -102,16 +122,13 @@ function 下载图集() {
     }, 'image/png');
 }
 
-document.addEventListener('keydown', function (e) {
-    if (e.target.tagName === 'INPUT') return;
-    switch (e.key) {
-        case 'w':
-        case 'W':
-            从纹理包覆盖图集();
-            break;
-        case 'e':
-        case 'E':
-            下载图集();
-            break;
+快捷键管理器.批量注册快捷键({
+    'w': {
+        回调: 从纹理包覆盖图集,
+        描述: '从纹理包覆盖图集'
+    },
+    'e': {
+        回调: 下载图集,
+        描述: '将图集导出为PNG'
     }
 });

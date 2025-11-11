@@ -168,14 +168,10 @@ function 导出mipmaps() {
     console.timeEnd('导出zip');
 }
 
-document.addEventListener('keydown', function (e) {
-    if (e.target.tagName === 'INPUT') return;
-    if (e.key === 'F1') {
-        e.preventDefault();
-        切换mipmap显示();
-        显示快捷键提示('mipmap工具 ' + (document.getElementById('mipmapPanel').classList.contains('active') ? '显示' : '隐藏'));
-    }
-});
+快捷键管理器.注册快捷键('m', function () {
+    切换mipmap显示();
+    显示快捷键提示('mipmap工具 ' + (document.getElementById('mipmapPanel').classList.contains('active') ? '显示' : '隐藏'));
+}, '显示Mipmap生成窗口');
 
 创建mipmap面板();
 绑定mipmap事件();
