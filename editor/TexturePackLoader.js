@@ -93,42 +93,9 @@ function canvas覆盖图集(离屏canvas) {
     });
 }
 
-// 导出功能函数
-function 下载图集() {
-    if (!全局图集) {
-        更新信息栏('没有可导出的图集');
-        return;
-    }
-
-    // 创建临时Canvas
-    const tempCanvas = document.createElement('canvas');
-    tempCanvas.width = 全局图集.width;
-    tempCanvas.height = 全局图集.height;
-    const tempCtx = tempCanvas.getContext('2d');
-    tempCtx.drawImage(全局图集, 0, 0);
-
-    // 转换为Blob并下载
-    tempCanvas.toBlob(function (blob) {
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'terrain-atlas.png';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-
-        更新信息栏('已导出PNG图集');
-    }, 'image/png');
-}
-
 快捷键管理器.批量注册快捷键({
     'w': {
         回调: 从纹理包覆盖图集,
         描述: '从纹理包覆盖图集'
-    },
-    'e': {
-        回调: 下载图集,
-        描述: '将图集导出为PNG'
     }
 });

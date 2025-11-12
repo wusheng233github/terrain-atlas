@@ -352,27 +352,6 @@ function 生成映射列表() {
     }
 }
 
-// 导出映射文件
-function 导出映射文件() {
-    if (!映射数据 || Object.keys(映射数据).length === 0) {
-        更新信息栏('没有映射数据可导出');
-        return;
-    }
-
-    let 映射内容 = '';
-    Object.keys(映射数据).forEach(key => {
-        if (映射数据[key]) {
-            映射内容 += `${key}=${映射数据[key]}\n`;
-        }
-    });
-
-    const 时间戳 = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
-    const 文件名 = `mapping-${时间戳}.txt`;
-
-    download(映射内容, 文件名, 'text/plain');
-    更新信息栏(`已导出映射文件: ${文件名}`);
-}
-
 // 切换映射编辑器
 function 切换映射编辑器() {
     if (映射编辑弹窗 && 映射编辑弹窗.classList.contains('active')) {
@@ -399,9 +378,5 @@ function 重写编辑器的鼠标点击事件处理() {
     'a': {
         回调: 切换映射编辑器,
         描述: '打开映射编辑器'
-    },
-    's': {
-        回调: 导出映射文件,
-        描述: '导出映射文件'
     }
 });

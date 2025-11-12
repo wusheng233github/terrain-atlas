@@ -151,15 +151,5 @@ function 切换UI演示() {
             显示快捷键提示((document.getElementById('uiDemoPanel') ? '显示' : '隐藏') + 'UI演示');
         },
         描述: '打开UI演示'
-    },
-    'c': {
-        回调: function () {
-            if (全局元数据) {
-                download(JSON.stringify(全局元数据), 'terrain.meta', 'text/plain');
-            } else {
-                更新信息栏('未加载元数据');
-            }
-        },
-        描述: '导出元数据'
     }
 });

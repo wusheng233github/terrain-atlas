@@ -148,47 +148,46 @@ function 处理控制点拖动(图像X, 图像Y) {
     更新信息栏('正在编辑\n' + 生成选中详细信息());
 }
 
-// 重写canvas的鼠标事件处理
-const 原处理点击事件 = 处理点击事件;
 
-处理点击事件 = function (x, y) {
-    const 图像X = Math.floor((x - offsetX) / scale);
-    const 图像Y = Math.floor((y - offsetY) / scale);
-
-    if (正在拖动控制点) {
-        正在拖动控制点 = false;
-        选中控制点索引 = -1;
-        更新画面();
-    } else {
-        // 检查是否点击了控制点
-        选中控制点索引 = 检查控制点点击(图像X, 图像Y);
-        if (选中控制点索引 === -1) {
-            return 原处理点击事件(x, y);
-        } else if (选中方块) {
-            正在拖动控制点 = true;
-            更新画面();
-        }
-    }
-    return true;
-};
-
-// 重写鼠标移动事件
-const 原MouseMove = canvas.onmousemove;
-
-canvas.onmousemove = function (e) {
-    if (正在拖动控制点 && 选中控制点索引 !== -1) {
-        const rect = canvas.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
+处理点击事件 = function (原处理点击事件) {
+    return function (x, y) {
         const 图像X = Math.floor((x - offsetX) / scale);
         const 图像Y = Math.floor((y - offsetY) / scale);
 
-        处理控制点拖动(图像X, 图像Y);
-        更新画面();
-    } else if (原MouseMove) {
-        原MouseMove(e);
-    }
-};
+        if (正在拖动控制点) {
+            正在拖动控制点 = false;
+            选中控制点索引 = -1;
+            更新画面();
+        } else {
+            // 检查是否点击了控制点
+            选中控制点索引 = 检查控制点点击(图像X, 图像Y);
+            if (选中控制点索引 === -1) {
+                return 原处理点击事件(x, y);
+            } else if (选中方块) {
+                正在拖动控制点 = true;
+                更新画面();
+            }
+        }
+        return true;
+    };
+}(处理点击事件);
+
+canvas.onmousemove = function (原MouseMove) {
+    return function (e) {
+        if (正在拖动控制点 && 选中控制点索引 !== -1) {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const 图像X = Math.floor((x - offsetX) / scale);
+            const 图像Y = Math.floor((y - offsetY) / scale);
+
+            处理控制点拖动(图像X, 图像Y);
+            更新画面();
+        } else if (原MouseMove) {
+            原MouseMove(e);
+        }
+    };
+}(canvas.onmousemove);
 
 // 初始化时更新控制点
 更新控制点();
