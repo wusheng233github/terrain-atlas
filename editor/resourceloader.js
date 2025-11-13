@@ -5,7 +5,8 @@ let 映射数据 = null;
 let 全局图集 = null; // FIXME: pixelstudio导出背景为黑色
 let 选中方块 = null;
 let 选中的UV编号 = -1;
-let 纹理包 = {};
+let 方块图片 = {};
+let 方块状态 = {};
 let 方块选中事件监听 = [];
 
 resizeCanvas = function (原resizeCanvas) {
@@ -95,6 +96,7 @@ resizeCanvas = function (原resizeCanvas) {
 
 let dropZone = document.createElement('div');
 dropZone.className = 'drop-zone';
+dropZone.innerText = '拖放文件到此处';
 document.body.appendChild(dropZone);
 
 let 预览图 = document.createElement('img');
@@ -345,18 +347,48 @@ function 导入纹理包(file) {
         const zip = new JSZip();
 
         zip.loadAsync(arrayBuffer).then(function (contents) {
-            纹理包 = {};
+            方块图片 = {};
+            方块状态 = {};
             const promises = [];
+
+            const mcmetaFile = zip.file('pack.mcmeta');
+            if (!mcmetaFile) {
+                更新信息栏('无效资源包，找不到pack.mcmeta');
+                return;
+            }
+
+            mcmetaFile.async('string').then(function (mcmetaContent) {
+                console.log(mcmetaContent);
+                const mcmeta = JSON.parse(mcmetaContent.trim());
+                if (!mcmeta.pack.pack_format) {
+                    // ...
+                }
+            });
 
             // 遍历ZIP中的文件
             zip.forEach(function (relativePath, zipEntry) {
-                if (zipEntry.dir) return;
-                const fileName = zipEntry.name.toLowerCase();
-                if (!fileName.endsWith('.png')) return;
+                if (zipEntry.dir) {
+                    return;
+                }
 
-                promises.push(zipEntry.async('blob').then(function (data) {
-                    纹理包[fileName] = URL.createObjectURL(data);
-                }));
+                const fileName = zipEntry.name.toLowerCase();
+                const 方块贴图路径 = 'assets/minecraft/textures/block/';
+                if (fileName.startsWith(方块贴图路径) && fileName.toLowerCase().endsWith('.png')) {
+                    promises.push(zipEntry.async('blob').then(function (data) {
+                        方块图片[fileName.slice(方块贴图路径.length)] = URL.createObjectURL(data);
+                    }));
+                    // TODO: metadata
+                } else if (fileName.startsWith('assets/minecraft/blockstates/') && fileName.toLowerCase().endsWith('.json')) {
+                    promises.push(zipEntry.async('string').then(function (data) {
+                        //方块状态[basename去后缀(fileName)] = JSON.parse(data.trim());
+                        try {
+                            导入方块状态(JSON.parse(data.trim()));
+                        } catch (e) {
+                            console.error(e);
+                        }
+                    }));
+                }
+
             });
 
             Promise.all(promises).then(function () {
@@ -387,7 +419,7 @@ function 获取PNG纹理数据(映射ID) {
     if (!文件名) {
         return null;
     }
-    return 纹理包[文件名.toLowerCase()];
+    return 方块图片[文件名.toLowerCase()];
 }
 
 function 获取选中方块映射ID() {
@@ -568,6 +600,47 @@ document.addEventListener('drop', function (e) {
         导入纹理包(zipFile);
     }
 });
+
+function 导入方块状态(json数据) {
+    return json数据;
+
+    const 穷举数据 = null;
+    if (json数据.variants) {
+        穷举数据 = json数据.variants;
+    } else if (json数据.multipart) {
+        穷举数据 = 组装转穷举(json数据.multipart);
+    }
+    if (!穷举数据) {
+        return;
+    }
+    const 穷举映射ID = 穷举转映射id(穷举数据);
+    if (!穷举映射ID) {
+        return;
+    }
+    // TODO
+}
+
+// xekr
+function 组装转穷举(组装数据) {
+    // TODO
+}
+
+function 穷举转映射id(穷举数据) {
+    if (typeof 穷举数据 !== 'object') {
+        return;
+    }
+    const 穷举映射ID = [];
+    for (const 条件 in 穷举数据) {
+        if (typeof 条件 !== 'string') {
+            continue;
+        }
+    }
+    return null;// TODO
+}
+
+function 导入模型纹理(模型数据) {
+    // TODO: 模型数据.textures.方向
+}
 
 function 按钮绑定文件输入(按钮的id, 文件输入的id) {
     document.getElementById(按钮的id).addEventListener('click', function () {

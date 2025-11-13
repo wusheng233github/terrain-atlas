@@ -199,7 +199,7 @@ function 打开映射编辑器() {
     }
 
     // 收集所有纹理文件
-    所有纹理文件 = Object.keys(纹理包 || {}).sort();
+    所有纹理文件 = Object.keys(方块图片 || {}).sort();
 
     // 设置当前映射值
     const 当前映射值 = 映射数据 ? 映射数据[当前映射键] : '';
@@ -295,7 +295,7 @@ function 生成映射列表() {
 
         // 创建图标（使用纹理预览）
         const 图标 = document.createElement('img');
-        图标.src = 纹理包[文件名];
+        图标.src = 方块图片[文件名];
         图标.alt = 文件名;
 
         图标容器.appendChild(图标);

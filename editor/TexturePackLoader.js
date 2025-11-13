@@ -1,7 +1,7 @@
 const 已加载纹理包加载器 = true;
 
 function 从纹理包覆盖图集() {
-    if (!全局图集 || !全局元数据 || !映射数据 || Object.keys(纹理包).length === 0) {
+    if (!全局图集 || !全局元数据 || !映射数据 || Object.keys(方块图片).length === 0) {
         更新信息栏('需要先加载资源');
         return;
     }
@@ -28,7 +28,8 @@ function 从纹理包覆盖图集() {
             const 映射ID = `${方块.name}+${uv索引}`;
             const 纹理文件名 = 映射数据[映射ID];
 
-            if (纹理文件名 && 纹理包[纹理文件名.toLowerCase()]) { // TODO: 支持tga格式，可能用某种元数据重定向，可能有某种随机纹理选择
+            if (纹理文件名 && 方块图片[纹理文件名.toLowerCase()]) { // TODO: 支持tga格式，可能用某种元数据重定向，可能有某种随机纹理选择
+                                                                // TODO: blockstates！！
                 const 加载Promise = new Promise((resolve) => {
                     const img = new Image();
                     img.onload = function () {
@@ -70,7 +71,7 @@ function 从纹理包覆盖图集() {
                         resolve(); // 即使出错也要resolve，不让整个Promise.all失败
                     };
 
-                    img.src = 纹理包[纹理文件名.toLowerCase()];
+                    img.src = 方块图片[纹理文件名.toLowerCase()];
                 });
                 加载Promises.push(加载Promise);
             }

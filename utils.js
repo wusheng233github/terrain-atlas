@@ -29,3 +29,16 @@ function canvas生成TGA(canvas, callback) {
 
     callback(tgaBlob);
 }
+
+function basename去后缀(路径 = "") {
+    // /.ab/.cd.e
+    // 0123456789
+    //     *   #
+    let 路径分隔符 = 路径.lastIndexOf('/');
+    let 结束 = 路径.lastIndexOf('.');
+    if (结束 === -1 || 结束 < Math.max(0, 路径分隔符)) {
+        结束 = 路径.length;
+    }
+    // -1 + 1 = 0
+    return 路径.slice(路径分隔符 + 1, 结束);
+}
