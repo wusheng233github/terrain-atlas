@@ -2,7 +2,6 @@ let 已加载mipmap生成 = true;
 let mipmaps = [];
 
 function 创建mipmap面板() {
-    // 创建样式
     const style = document.createElement('style');
     style.textContent = `
         .mipmap-preview {
@@ -43,12 +42,9 @@ function 创建mipmap面板() {
     `;
     document.head.appendChild(style);
 
-    // 创建面板HTML
     const panel = document.createElement('div');
     panel.id = 'mipmapPanel';
-    panel.classList.add('popup-panel');
-    panel.classList.add('左');
-    panel.classList.add('下');
+    panel.className = 'popup-panel 左 下';
     panel.innerHTML = `
         <div>mipmap生成工具</div>
         <div class="edit-controls">
@@ -90,7 +86,6 @@ function 生成mipmaps() {
 
     mipmaps = [];
 
-    // 创建原始尺寸的mipmap
     const originalCanvas = document.createElement('canvas');
     originalCanvas.width = 全局图集.width;
     originalCanvas.height = 全局图集.height;
@@ -98,7 +93,6 @@ function 生成mipmaps() {
     originalCtx.imageSmoothingEnabled = false;
     originalCtx.drawImage(全局图集, 0, 0);
 
-    // 生成缩小的mipmap级别
     let currentWidth = 全局图集.width;
     let currentHeight = 全局图集.height;
 

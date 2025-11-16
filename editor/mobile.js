@@ -1,7 +1,6 @@
 let 已加载手机端优化 = true;
 
 function 创建手机快捷键按钮() {
-    // 创建按钮元素
     const 快捷键按钮 = document.createElement('button');
     快捷键按钮.id = 'mobileShortcutBtn';
     快捷键按钮.className = 'btn 方 大 primary';
@@ -12,12 +11,10 @@ function 创建手机快捷键按钮() {
     快捷键按钮.style.left = '12px';
     快捷键按钮.style.zIndex = '1';
 
-    // 创建菜单弹窗
     const 菜单弹窗 = document.createElement('div');
     菜单弹窗.id = 'mobileShortcutMenu';
     菜单弹窗.className = 'popup-panel 中 窄 list-container';
 
-    // 添加样式 - 与 mapping.js 保持一致
     const 样式 = document.createElement('style');
     样式.textContent = `
         .shortcut-description {
@@ -26,33 +23,19 @@ function 创建手机快捷键按钮() {
     `;
     document.head.appendChild(样式);
 
-    // 按钮点击事件
     快捷键按钮.addEventListener('click', function () {
         const 当前显示状态 = 快捷键按钮.classList.contains('active');
 
         if (当前显示状态) {
-            // 关闭菜单
             菜单弹窗.classList.remove('active');
             快捷键按钮.classList.remove('active');
         } else {
-            // 打开菜单
             刷新快捷键列表(菜单弹窗);
             菜单弹窗.classList.add('active');
             快捷键按钮.classList.add('active');
         }
     });
 
-    // 点击菜单外部关闭
-    document.addEventListener('click', function (e) {
-        if (菜单弹窗.style.display === 'block' &&
-            !菜单弹窗.contains(e.target) &&
-            !快捷键按钮.contains(e.target)) {
-            菜单弹窗.classList.remove('active');
-            快捷键按钮.classList.remove('active');
-        }
-    });
-
-    // 添加到页面
     document.body.appendChild(快捷键按钮);
     document.body.appendChild(菜单弹窗);
 }
@@ -82,7 +65,7 @@ function 刷新快捷键列表(菜单弹窗) {
             const 按键 = this.getAttribute('data-key');
             if (快捷键管理器.回调列表[按键]) {
                 快捷键管理器.回调列表[按键].回调();
-                // 关闭菜单
+
                 菜单弹窗.classList.remove('active');
                 document.getElementById('mobileShortcutBtn').classList.remove('active');
             }

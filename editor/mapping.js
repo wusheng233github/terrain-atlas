@@ -1,13 +1,11 @@
 const 映射编辑器已加载 = true;
 
-// 映射编辑相关变量
 let 映射编辑弹窗 = null;
 let 映射输入框 = null;
 let 映射列表容器 = null;
 let 当前映射键 = null;
 let 所有纹理文件 = [];
 
-// 添加映射编辑器样式
 const 样式 = document.createElement('style');
 样式.textContent = `
     #mappingEditor {
@@ -93,9 +91,7 @@ const 样式 = document.createElement('style');
 `;
 document.head.appendChild(样式);
 
-// 初始化映射编辑器
 function 初始化映射编辑器() {
-    // 创建映射编辑弹窗
     映射编辑弹窗 = document.createElement('div');
     映射编辑弹窗.id = 'mappingEditor';
     映射编辑弹窗.className = 'popup-panel 中';
@@ -106,7 +102,6 @@ function 初始化映射编辑器() {
         </div>
         <div class="list-container">
             <div id="mappingList">
-                <!-- 映射列表将在这里动态生成 -->
             </div>
         </div>
         <div class="btn-controls">
@@ -116,12 +111,10 @@ function 初始化映射编辑器() {
 
     document.body.appendChild(映射编辑弹窗);
 
-    // 获取元素引用
     映射输入框 = document.getElementById('mappingInput');
     映射列表容器 = document.getElementById('mappingList');
     const 确定按钮 = document.getElementById('mappingConfirm');
 
-    // 绑定事件
     确定按钮.addEventListener('click', 关闭映射编辑器);
 
     映射输入框.addEventListener('keydown', function (e) {
@@ -156,32 +149,25 @@ function 初始化映射编辑器() {
         }
     });
 
-    // 实时搜索
     映射输入框.addEventListener('input', function () {
         生成映射列表();
     });
 }
 
-// 选择映射项目
 function 选择映射项目(项目元素) {
-    // 移除其他项的选中状态
     document.querySelectorAll('.list-item').forEach(item => {
         item.style.backgroundColor = '';
         item.classList.remove('selected');
     });
 
-    // 设置当前项为选中状态
     项目元素.classList.add('selected');
 
-    // 更新输入框
     const 文件名 = 项目元素.querySelector('.mapping-filename').textContent;
     映射输入框.value = 文件名;
 
-    // 滚动到选中项
     项目元素.scrollIntoView({ block: 'nearest' });
 }
 
-// 打开映射编辑器
 function 打开映射编辑器() {
     if (!映射编辑弹窗) {
         初始化映射编辑器();
@@ -198,31 +184,24 @@ function 打开映射编辑器() {
         return;
     }
 
-    // 收集所有纹理文件
     所有纹理文件 = Object.keys(方块图片 || {}).sort();
 
-    // 设置当前映射值
     const 当前映射值 = 映射数据 ? 映射数据[当前映射键] : '';
     映射输入框.value = 当前映射值 || '';
 
-    // 生成映射列表
     生成映射列表();
 
-    // 显示弹窗
     映射编辑弹窗.classList.add('active');
 
-    // 聚焦输入框
     映射输入框.focus();
     映射输入框.select();
 }
 
-// 关闭映射编辑器
 function 关闭映射编辑器() {
     if (!映射编辑弹窗 || !当前映射键) return;
 
     const 新映射值 = 映射输入框.value.trim();
 
-    // 更新映射数据
     if (!映射数据) {
         映射数据 = {};
     }
@@ -231,19 +210,15 @@ function 关闭映射编辑器() {
         映射数据[当前映射键] = 新映射值;
         更新信息栏(`已更新映射: ${当前映射键} -> ${新映射值}`);
     } else {
-        // 如果输入为空，删除映射
         delete 映射数据[当前映射键];
         更新信息栏(`已删除映射: ${当前映射键}`);
     }
 
-    // 隐藏弹窗
     映射编辑弹窗.classList.remove('active');
 
-    // 更新纹理预览
     设置纹理预览(true);
 }
 
-// 生成映射列表
 function 生成映射列表() {
     if (!映射列表容器) return;
 
@@ -268,7 +243,6 @@ function 生成映射列表() {
         return;
     }
 
-    // 显示搜索结果信息
     if (搜索文本) {
         const 搜索信息 = document.createElement('div');
         搜索信息.className = 'mapping-search-info';
@@ -283,29 +257,24 @@ function 生成映射列表() {
         const 列表项 = document.createElement('div');
         列表项.className = 'list-item 紧凑';
 
-        // 如果此项与当前输入完全匹配，则选中
         if (文件名.toLowerCase() === 当前映射值) {
             列表项.classList.add('selected');
             选中项索引 = 索引;
         }
 
-        // 创建图标容器
         const 图标容器 = document.createElement('div');
         图标容器.className = 'mapping-icon';
 
-        // 创建图标（使用纹理预览）
         const 图标 = document.createElement('img');
         图标.src = 方块图片[文件名];
         图标.alt = 文件名;
 
         图标容器.appendChild(图标);
 
-        // 创建文件名显示
         const 文件名显示 = document.createElement('div');
         文件名显示.className = 'mapping-filename';
         文件名显示.textContent = 文件名;
 
-        // 高亮搜索文本
         if (搜索文本) {
             const 文件名小写 = 文件名.toLowerCase();
             const 搜索索引 = 文件名小写.indexOf(搜索文本);
@@ -317,16 +286,13 @@ function 生成映射列表() {
             }
         }
 
-        // 组装列表项
         列表项.appendChild(图标容器);
         列表项.appendChild(文件名显示);
 
-        // 点击事件
         列表项.addEventListener('click', function () {
             选择映射项目(this);
         });
 
-        // 双击事件 - 直接应用并关闭
         列表项.addEventListener('dblclick', function () {
             映射输入框.value = 文件名;
             关闭映射编辑器();
@@ -335,7 +301,6 @@ function 生成映射列表() {
         映射列表容器.appendChild(列表项);
     });
 
-    // 自动滚动到选中项
     if (选中项索引 !== -1) {
         const 选中项 = 映射列表容器.children[搜索文本 ? 1 : 0]; // 考虑搜索信息条
         if (选中项) {
@@ -344,7 +309,6 @@ function 生成映射列表() {
             }, 100);
         }
     } else if (过滤后的文件.length > 0) {
-        // 如果没有选中项，选中第一个
         const 第一项 = 映射列表容器.children[搜索文本 ? 1 : 0];
         if (第一项) {
             第一项.classList.add('selected');
@@ -352,7 +316,6 @@ function 生成映射列表() {
     }
 }
 
-// 切换映射编辑器
 function 切换映射编辑器() {
     if (映射编辑弹窗 && 映射编辑弹窗.classList.contains('active')) {
         关闭映射编辑器();
@@ -361,18 +324,14 @@ function 切换映射编辑器() {
     }
 }
 
-function 重写编辑器的鼠标点击事件处理() {
-    const 原处理点击事件 = 处理点击事件;
-
-    处理点击事件 = function (x, y) {
+处理点击事件 = function (原处理点击事件) {
+    return function (x, y) {
         if (映射编辑弹窗 && 映射编辑弹窗.classList.contains('active')) {
             return true;
         }
         return 原处理点击事件(x, y);
     };
-}
-
-重写编辑器的鼠标点击事件处理();
+}(处理点击事件);
 
 快捷键管理器.批量注册快捷键({
     'a': {
