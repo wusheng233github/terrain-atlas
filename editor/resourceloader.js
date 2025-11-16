@@ -94,6 +94,47 @@ resizeCanvas = function (原resizeCanvas) {
     </div>
 `;
 
+let 元数据导出窗口 = document.createElement('div');
+元数据导出窗口.className = 'popup-panel 左 下';
+document.body.appendChild(元数据导出窗口);
+
+let 浮点模式勾选框 = document.createElement('input');
+浮点模式勾选框.id = 'metadataFloatModeExport';
+浮点模式勾选框.type = 'checkbox';
+元数据导出窗口.appendChild(浮点模式勾选框);
+
+let 浮点模式勾选框的文字 = document.createElement('label');
+浮点模式勾选框的文字.htmlFor = 'metadataFloatModeExport';
+浮点模式勾选框的文字.innerText = '浮点比例模式(<0.14)';
+元数据导出窗口.appendChild(浮点模式勾选框的文字);
+
+let 元数据导出按钮 = document.createElement('button');
+元数据导出按钮.innerText = '导出元数据';
+元数据导出按钮.className = 'btn 大 宽';
+元数据导出按钮.addEventListener('click', function () {
+    if (!全局元数据) {
+        更新信息栏('未加载元数据');
+        return;
+    }
+    let 元数据内容 = 全局元数据;
+    if (浮点模式勾选框.checked) {
+        元数据内容 = JSON.parse(JSON.stringify(元数据内容));
+        元数据内容.forEach(function (方块数据) {
+            方块数据.uvs.forEach(function (UV数据) {
+                const 图集宽度 = UV数据[4];
+                const 图集高度 = UV数据[5];
+                UV数据[0] /= 图集宽度;
+                UV数据[1] /= 图集高度;
+                UV数据[2] /= 图集宽度;
+                UV数据[3] /= 图集高度;
+            });
+        });
+    }
+    download(JSON.stringify(元数据内容), 'terrain.meta', 'text/plain');
+    更新信息栏('已导出元数据');
+});
+元数据导出窗口.appendChild(元数据导出按钮);
+
 let dropZone = document.createElement('div');
 dropZone.className = 'drop-zone';
 dropZone.innerText = '拖放文件到此处';
@@ -282,8 +323,13 @@ function 导入0点8方块元数据(方块数据) {
 }
 
 function 导出元数据() {
-    download(JSON.stringify(全局元数据), 'terrain.meta', 'text/plain');
-    更新信息栏('已导出元数据');
+    if (元数据导出窗口.classList.contains('active')) {
+        元数据导出窗口.classList.remove('active');
+        更新信息栏('关闭元数据导出窗口');
+    } else {
+        元数据导出窗口.classList.add('active');
+        更新信息栏('打开元数据导出窗口');
+    }
 }
 
 function 加载映射文件(file) {
