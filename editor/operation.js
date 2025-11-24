@@ -1,4 +1,4 @@
-// TODO: 启用
+// TODO: 清理完再启用
 const 已加载撤销重做 = true;
 
 const 操作事件监听 = [];

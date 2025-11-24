@@ -297,7 +297,6 @@ canvas.addEventListener('touchcancel', function (e) {
     正在触摸 = false;
     双指距离 = 0;
     触摸点 = [];
-    canvas.style.cursor = 'move';
 });
 
 document.addEventListener('keydown', function (e) {
